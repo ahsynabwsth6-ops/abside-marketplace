@@ -12,25 +12,36 @@
         <div>🛒</div>
     </div>
 
-    <div class="search-box">
-        ابحث عن منتج...
+    <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن منتج..." style="width:100%; border:none;">
+
+    <div class="products" id="productsContainer">
+        {% for product in products %}
+        <div class="product-card">
+            <h3>{{ product.name }}</h3>
+            <p>${{ "{:,.0f}".format(product.price) }}</p>
+        </div>
+        {% endfor %}
     </div>
 
-    <div class="banner">
-        <h2>عرض حصري</h2>
-        <p>iPhone 18 - توصيل موثق</p>
-    </div>
+    <script>
+    const input = document.getElementById('searchInput');
+    const container = document.getElementById('productsContainer');
 
-    <div class="products">
-        <div class="product-card">
-            <h3>iPhone 18 Pro</h3>
-            <p>$1,299</p>
-        </div>
-        <div class="product-card">
-            <h3>سيارة 2026</h3>
-            <p>$28,500</p>
-        </div>
-    </div>
+    input.addEventListener('input', function() {
+        const query = input.value;
+        fetch('/api/search?q=' + encodeURIComponent(query))
+            .then(res => res.json())
+            .then(data => {
+                container.innerHTML = '';
+                data.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = '<h3>' + p.name + '</h3><p>$' + p.price.toLocaleString() + '</p>';
+                    container.appendChild(card);
+                });
+            });
+    });
+    </script>
 
 </body>
 </html>
